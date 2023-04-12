@@ -1,0 +1,990 @@
+#+Title: Introduction to Scripting for Scientists
+#+Subtitle: A Very Brief Guide for the Intrepid Labratorian
+#+Author: Delta Alexander Sharp
+#+Email: nalisarc@gmail.com
+#+STARTUP: beamer
+* Export Setting                                                   :noexport:
+#+DESCRIPTION: 
+#+KEYWORDS: 
+#+LANGUAGE:  en
+#+OPTIONS:   H:2 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:https://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+HTML_LINK_UP:
+#+HTML_LINK_HOME:
+#+beamer_theme: Madrid
+
+#+COLUMNS: %40ITEM %10BEAMER_env(Env) %9BEAMER_envargs(Env Args) %4BEAMER_col(Col) %10BEAMER_extra(Extra)
+
+
+
+ 
+* End block                                                        :noexport:
+copy this into a frame to end a block. 
+#+begin_src org
+,*** End of block                                               :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+#+end_src
+
+* Setup                                                            :noexport:
+#+begin_src ipython :session i2sc
+%matplotlib inline
+import matplotlib.pyplot as plt
+import numpy as np
+import random 
+#+end_src
+
+#+RESULTS:
+: # Out[72]:
+
+
+* Exporter                                                         :noexport:
+
+Replace the exporter with the desired one and then just export as latex-beamer~
+#+call: beamer-export()
+
+
+** Beamer Setting                                                  :noexport:
+Run this block to export as standard beamer presentation
+#+name: beamer-export
+#+begin_src org
+,#+LaTeX_CLASS: beamer
+,#+LaTeX_CLASS_OPTIONS: [allowframebreaks]
+,#+OPTIONS: H:2
+#+end_src
+
+** Handout Setting                                                 :noexport:
+Run this block to theoretically export it with my extra notes but no animation.
+#+name: handout-export
+#+begin_src org
+,#+OPTIONS: H:2
+,#+LaTeX_CLASS: beamer
+,#+LaTeX_CLASS_OPTIONS: [handout]
+,#+LATEX_HEADER: %%% For handouts with lots of extra notes
+,#+LATEX_HEADER: \documentclass[handout]{beamer}
+,#+LATEX_HEADER: \usepackage{pgfpages}
+,#+LATEX_HEADER: \pgfpagesuselayout{2 on 1}[a4paper,border shrink=5mm] % could also use letterpaper
+,#+LATEX_HEADER: \setbeameroption{show notes on second screen=bottom} % Beamer manual, section 19.3
+,#+LATEX_HEADER: %%%
+,#+LATEX_HEADER: 
+,#+LATEX_HEADER: \setbeamertemplate{note page}[plain] % Beamer manual, section 19.1
+,#+LATEX_HEADER: \newlength{\parskipbackup}
+,#+LATEX_HEADER: \setlength{\parskipbackup}{\parskip}
+,#+LATEX_HEADER: \newlength{\parindentbackup}
+,#+LATEX_HEADER: \setlength{\parindentbackup}{\parindent}
+,#+LATEX_HEADER: \newcommand{\baselinestretchbackup}{\baselinestretch}
+,#+LATEX_HEADER: \usetemplatenote{\rmfamily \scriptsize%
+,#+LATEX_HEADER:   \setlength{\parindent}{1em} \setlength{\parskip}{1ex}%
+,#+LATEX_HEADER:   \renewcommand{\baselinestretch}{1}%
+,#+LATEX_HEADER:   \noindent \insertnote%
+,#+LATEX_HEADER: 
+,#+LATEX_HEADER:   \setlength{\parskip}{\parskipbackup}%
+,#+LATEX_HEADER:   \setlength{\parindent}{\parindentbackup}%
+,#+LATEX_HEADER:   \renewcommand{\baselinestretch}{\baselinestretchbackup}%
+,#+LATEX_HEADER: }
+#+end_src
+
+
+* Introduction
+** Who am I?
+My name Is Delta Alexander Smith (they/them.)\\
+Mad scientist extraordinaire. 
+*** Experience
+ - I've been programming since early 2014, specializing in:
+   - Data Science
+   - Embedded Devices
+   - Reproducable Research
+ - I've written multiple pieces of internal business software which have increased productivity.
+
+
+
+** Discussion Expectations
+For the sake of time, we need to establish a scope for our discussion.
+*** What we'll be covering                                            :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.6
+:END:
+ - What is programming (scripting)
+ - How computers represent things. 
+ - How scripting can make your work more reproducable.
+ - Why introducing scripts can make your work easier as a scientist.
+*** What we won't                                                     :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.4
+:END:
+ - Artificial intelligence (AI)
+ - Best practices
+ - Details
+
+** On Jargon
+
+*** Block                                                   :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+Unfortuately as in every domain of science, Computer Science  is racked full of jargon.
+
+*** Examples of Jagon                                             :B_example:
+:PROPERTIES:
+:BEAMER_ENV: exampleblock
+:END:
+ - strings, floats, dictionaries
+ - sequences, maps, iterators
+ - functions, class, objects
+ - paths, api(s), 
+
+*** endblock                                                :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+Most of these terms are confusing to newcomers.
+But it is vital to not get too hung up on the terminiology.
+
+** What Is Scripting?
+Programmers love to make up names for things:
+*** Program                                                    :B_definition:
+:PROPERTIES:
+:BEAMER_env: definition
+:END:
+A set of instructions interpreted by a computer.
+
+
+ 
+*** Script                                                     :B_definition:
+:PROPERTIES:
+:BEAMER_env: definition
+:END:
+A program that typically:
+ - is specialized to a task
+ - has minimal user interaction
+ - can be called from the commandline or other scripts
+
+   
+ 
+*** The commandline and shells                                       :B_note:
+:PROPERTIES:
+:BEAMER_env: note
+:END:
+Most applications do not need a graphical user interface (GUI).
+Instead they are called using the shell.
+
+The shell (sometimes called the terminal or commandline) are a textual interface for a computer.
+
+You type in a command(stdin)  and the output is written to the screen (stdout).
+
+Errors (stderr) are usually written in different colors.
+
+Commands consist of a program to run, followed by arguments such as flags, or input and output files.
+
+Programs can be "piped" into eachother allowing for very powerful systems made from standardized parts.
+
+The output of programs can be written to specific files allowing for logs.
+
+The shell is often viewed as intimedating, but it is arguably the most flexible
+way to interact with a computer.
+
+The shell can run over serial connections allowing for so called "headless machines."
+
+**** Example Shells
+ - Powershell,
+ - Bash,
+ - Zsh
+
+
+
+**** Example Unix
+
+**** Example Windows
+
+*** Shell and the Kernel                                             :B_note:
+:PROPERTIES:
+:BEAMER_env: note
+:END:
+
+A computer operating system (OS) is a very complex engine that
+make using a computer pleasant.
+
+The metaphor used to describe the different parts of an operating system
+is that of a grain or seed.
+
+The shell is the outermost part the user interacts with,
+beneth is the kernel which the seed is built out from.
+
+
+
+
+* TODO Computers are a revolutionary tool
+
+** TODO Computers can handle Massive data sets 
+
+*** How big is the human genome?                            :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+The human genome is made up of 3.2 billion base pairs.
+
+*** Exercise: How big is that?                                      :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+How long do you think it would take someone to transcribe one, at 60 wph,
+taking 8 hour days?
+
+**** Answers                                                :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+
+ - A. 1 year
+ - B. 100 years
+ - C. 50 years
+ - D. 30 years
+
+*** Rapid Sequencing                                         :B_exampleblock:
+:PROPERTIES:
+:BEAMER_env: exampleblock
+:END:
+Stanford scientists set a record in 2022 by sequencing a whole human
+genome in just over 5 hours!
+
+
+** How do computers store things?
+First some definitions:
+*** Bit                                                  :B_definition:
+:PROPERTIES:
+:BEAMER_env: definition
+:END:
+A bit is an object,that can be in one of two states.
+ - on or off
+ - 1 or 0
+ - True or False
+*** Byte                                                       :B_definition:
+:PROPERTIES:
+:BEAMER_env: definition
+:END:
+A byte is a sequence of 8 bits.
+** Computers things using bytes!
+*** Nearly everything can be stored digitally                       :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+By carefully arranging large segments of bytes you can represent virtually anything
+you want.
+ - Text is usually represented using the utf-8 encoding today.
+   - Books, finantial data, sensor readings, etc tend to be textual data.
+ - Graphical assets can be stored in a multitude of ways:
+   - png, jpg, bmp, to name a few.
+ - Binary blobs can represent pretty much anything.
+   - A surprising number of files are a compressed archive!  
+** Scales of Information
+As these bytearrays build up in size they can express more and more
+complex ideas.
+*** Common prefixes                                           :B_block:BMCOL:
+:PROPERTIES:
+:BEAMER_env: block
+:BEAMER_col: 0.4
+:END:
+
+
+| Prefix    | number of bits |
+|-----------+----------------|
+|           |              1 |
+|-----------+----------------|
+| Kilo (kb) |           1e+3 |
+|-----------+----------------|
+| Mega (mb) |           1e+6 |
+|-----------+----------------|
+| Giga (gb) |           1e+9 |
+|-----------+----------------|
+| Tera (tb) |          1e+12 |
+
+*** Examples of files sizes                            :B_exampleblock:BMCOL:
+:PROPERTIES:
+:BEAMER_env: exampleblock
+:BEAMER_col: 0.6
+:END:
+
+| File type    | typical size   |
+|--------------+----------------|
+| Images       | ~2kb - 1000kb  |
+|--------------+----------------|
+| Documents    | ~4kb - 5mb     |
+|--------------+----------------|
+| Music        | ~3mb - 4mb     |
+|--------------+----------------|
+| Video        | ~4gb - 20gb    |
+|--------------+----------------|
+| Genomic Data | ~100mb - 100tb |
+
+*** Computers don't understand data!                                :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+Computers only /see/ and work on these blobs.\\
+The meaning comes from people.
+
+** Computers are precise and repeatable    
+*** Computers designed to be deterministic                          :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+ - They do exactly what you tell them
+ - As many times as you need
+ - Whenever you want them to
+
+*** Ideal use cases for computers                                   :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+ - Continous monitoring of sensor data
+ - Alerting when readings are out of spec
+ - Recording experimental data as it happens
+ - Precise timing at super human speeds
+ - Calculation and Validation
+   
+*** Origin of the Word: Computer                                     :B_note:
+:PROPERTIES:
+:BEAMER_env: note
+:END:
+The word computer originally referred to a profession held by primarily women.
+
+Human Computers would take a set of inputs, and perform a set of *computations* (a program)
+producing a set of output.
+
+These people were vital for many fields ranging from:
+ - business
+ - academic
+ - military
+ - navagation
+
+Prior to electronic computers existed mechanical computers such as the differential engine.
+
+
+
+** Computers have Consequences
+*** Computers are complex systems                                   :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+Unfortuantely real computers run on physical machines.\\
+Which makes them subject to intermittent and unpredictable errors.
+ - This is why you are asked to restart machines
+ - Resetting a machine /usually/ returns it to a known state
+*** Computers are fallable!                                    :B_alertblock:
+:PROPERTIES:
+:BEAMER_env: alertblock
+:END:
+ Computers will quickly perform badly formed or malicious commands!
+ - Computers can and *will* destroy themselves when ordered.
+ - Bad code can and *will* be exploited.
+ - Computer networks scale this damage up *exponentially*
+
+*** Virtual Machines                                                 :B_note:
+:PROPERTIES:
+:BEAMER_env: note
+:END:
+Computers can actually simulate other computers! This process is usually
+called virtualization or emulation depending on the context.
+*** Virtualization lets you share consistently                       :B_note:
+:PROPERTIES:
+:BEAMER_env: note
+:END:
+One major use for virtualization is making environments that behave
+the same regardless of the host machine.
+
+However this is a non trivial process which is beyond the scope of
+this discussion.
+*** Malware                                                          :B_note:
+:PROPERTIES:
+:BEAMER_env: note
+:END:
+Just as chemistry can produce wonderful medicines, and terrible toxins;
+computers can be used for evil. 
+**** What is it?
+Malware is code that does something harmful to you, your machine, or anything
+connected to those machines.
+**** Why is it made?
+Many forms of malware were made accidentally or as a proof of concept.
+However there are some malicous actors that do so for nefarious reasons
+like identity theft, or espionage.
+
+
+****  General advice                                         :B_exampleblock:
+:PROPERTIES:
+:BEAMER_env: exampleblock
+:END:
+That being said, *every* tool can be misused.
+ - Don't use personal computers for work.
+ - Don't use work computers for personal reasons.
+ - Don't plug nonsecure devices into secure one.
+ - If it doesn't need a network connection; don't connect it.
+
+*** On Hackers                                                       :B_note:
+:PROPERTIES:
+:BEAMER_env: note
+:END:
+A hacker is a person who is interested in a topic (typically computers.)
+
+Hackers approach problems from a different direction than many, trying stuff and seeing what happens.
+Some record what they find and share it with their peers.
+
+In other words, a scientist is a type of hacker.
+
+Confusing a hacker with a cyber-criminal is like mistaking a clandestine chemist with
+a pharmacist. 
+** TODO Data Visualization enables better communication and understanding
+Computers are able to render graphics faster and more accurately than people
+which enables a multitude of opportunities.
+*** Good data visualization is vital!                             :B_theorem:
+:PROPERTIES:
+:BEAMER_env: theorem
+:END:
+Good data visualization helps people understand very complex datasets
+and communicate those ideas.
+*** Dashboards help make decisions on the fly!                      :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+#+caption: [[cite:&magnify-2023-sanguine]]
+#+begin_quotation
+[Using Sanguine] Joshua M. Zimmerman, MD, can visualize several scenarios [from patient data]
+to better prepare his patients for surgery.
+#+end_quotation
+
+** General Datavisualization Tips
+ - When in doubt, Bar graph it out!
+ - Use a combination of colors and symbols
+   - does it make senses in black/white?
+ - Clear titles, and legends are your friends!
+
+
+** Computers and people are good at different things!
+It can be tempting to try and use computers for everything.
+However, this is a naive approach.
+
+*** Computers and people are suited for fundimentally different things :B_theorem:
+:PROPERTIES:
+:BEAMER_env: theorem
+:END:
+
+**** Computer Problems                                                :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+ - Data storage and retrevial
+ - Search engines
+ - Continous sensor monitoring
+ - Ultra high speed signal processing
+ - Automatable tasks
+**** People Problems                                                  :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+ - General problem solving
+ - Complex analysis
+ - Non standard environments
+ - Fuzzy problems
+ - Creative tasks
+*** On automation                                                    :B_note:
+:PROPERTIES:
+:BEAMER_env: note
+:END:
+There different types of problems that can be solved in what is called polynomial time (P type problems)
+and ones that can only be solved in non-polynomial time (NP type problems)
+
+Computers can only really solve P type problems.
+However checking if a potential solution is correct is a P type problem.
+
+People can solve NP type problems but they can't really explain how.
+
+Many games are based on NP type problems.
+
+For further reading, look into the halting problem.
+
+** Scripting allows you to redo you work easily             
+Reusing code can let you standardize and automate your workflow.
+*** Problem
+You have 1000 files you need to read in for a report.
+**** Solution
+Rather than performing the same steps again and again, write a function and apply it to every file in the folder.
+*** Other examples
+ - Making charts and graphs
+ - Renaming and archiving old batches
+ - Uploading reports to client servers
+ - Fetching data from a server or api
+ - Sending an email after a long run experiment
+   
+
+** Version Control 
+Often times people will need to collaborate on a project.
+
+*** Block                                                   :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+This introduces many problems such as:
+ - Overwriting eachother's work
+ - Stale and out of date copies
+ - Breaking changes
+ - Crediting contributions
+
+*** Block                                                   :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+The solution is versioning software such as:
+ - git
+ - subversion
+ - mastercontrol
+
+** Version control will save you countless headaches
+At somepoint you *will* make a mistake. Or something will break.
+
+Versioning lets you ensure that a project is in a usable state by:
+ - checking in changes
+ - isolating your staging and production copies
+ - reverting a branch to a working state
+ - checking code meets project guidelines
+** In short:
+Scripting makes your work more robust and reproducible!
+*** Science is based on reproducibility!
+How do you find out how the world works?
+ - Observe:
+   What are you interested in learning?
+ - Hypothesize:
+   What do you think is happening?
+ - Test:
+   Cast your ideas to the crucible! 
+ - Document and Share:
+   Show your work!
+
+*** block                                                   :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+Reproducibility is the heart of the scientific method.
+
+* TODO Getting Started with Python
+
+** Installing Python
+
+*** Python
+Python can be installed on all major computer operating systems from their
+downloads page https://www.python.org/downloads/
+*** Anaconda
+Anaconda is set of tools including python, jupyter, etc,
+It's often used by professionals as it bundles a lot of useful tools.
+You can get it at https://www.anaconda.com/products/distribution
+** Launching python
+After installing, you can access the python interpreter using the command line.
+[  picture of commandline ]
+[  picture of python command ]
+[  picture of python repl  ]
+
+** Types and how things are represented
+Built into python are a few representations of things.
+These things are called *objects*, which can have different *types*
+*** Common Types
+ - Numeric:\\
+   Integers, Floating Points, Complex Numbers
+ - Sequence and mappings:\\
+   Lists, Tuples, Strings, Dictionaries, Ranges
+ - Functions:\\
+   Code you want to reuse
+ - Classes and objects:\\
+   Bundles of code and data
+   
+
+
+** Numerics
+Python has three built in ways of representing numbers:
+
+*** Types of Built in Numbers                                :B_exampleblock:
+:PROPERTIES:
+:BEAMER_env: exampleblock
+:END:
+ 1. Integers (int)
+    - Whole numbers.
+    - Infinite precision.
+ 2. Floating point (float)
+    - Decimals (but in base 2)
+    - precision limited by hardware.
+ 3. Complex number (complex)
+    - exists on the complex plane.
+    - has a real and an imaginary part.  
+    - can have both float and int parts.
+      
+*** Numerical Bases and You
+People tend to count in decimal, a system using ten symbols to represent numbers.
+However this system is completely arbitrary.
+
+People have counted in many diffent bases such as:
+ - Binary (base 2)
+ - Octal (base 8)
+ - Duodecimal (base 12)
+ - Hexidecimal (base 16)
+ - Sexagesimal (base 60)
+
+Each having its own distinct advantages and disadvantages.
+
+
+
+** Precision, Accuracy, and Uncertainty
+It can be tempting to think that computers are better at math than people.
+*** Consider the following:                                         :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+Computers have a limited memory to represent numbers with.
+\\
+**** Code                                              :B_exampleblock:BMCOL:
+:PROPERTIES:
+:BEAMER_env: exampleblock
+:BEAMER_col: 0.4
+:END:
+
+#+name: floating_point_error_demo
+#+begin_src ipython :session i2sc :results output raw :exports code :noeval 
+a = 1.2
+b = 1.0
+
+print(a - b)
+#+end_src
+
+
+**** What result do you expect?                               :B_block:BMCOL:
+:PROPERTIES:
+:BEAMER_env: block
+:BEAMER_col: 0.45
+:END:
+ - A. 0.20000000000000000
+ - B. @@beamer: {\color<2>[rgb]{0,0.6,0}@@0.19999999999999996@@beamer:}@@
+ - C. 1.00000000000000001
+ - D. 0.19000000000000005
+
+*** Garbage in, garbage out!                                   :B_alertblock:
+:PROPERTIES:
+:BEAMER_env: alertblock
+:END:
+Remember to account for the uncertainty in your calculations or you'll end up with mysterious errors and useless data.
+
+
+
+** Sequences and Collections
+Sometimes, you need to store a bunch of things together.
+This is done using lists, tuples, and dictionaries
+ 
+*** List
+#+begin_src ipython :noeval 
+example_list = [0,1,2,3]
+#+end_src
+
+*** Tuple
+#+begin_src ipython :noeval 
+example_tuple = (1,2,3,4)
+#+end_src
+
+
+** Dictionaries and Mappings
+Dictionaries are a way to represent information as a collection of key, value pairs.\\
+This collection is *hashed* allowing the computer to quickly associate between the pairs.
+*** Example Dictionary                                 :B_exampleblock:BMCOL:
+:PROPERTIES:
+:BEAMER_env: exampleblock
+:BEAMER_col: 0.6
+:END:
+#+begin_src ipython :noeval 
+example_dict = {"key1": "value1",
+                "key2": 2,
+                "key3": (1,2,3)}
+
+print(example_dict["key1"])
+print(example_dict.keys())
+
+for k,v in example_dict:
+    print(k,v)
+#+end_src
+*** Hashes
+Hashing is a type of mathematical function that produces a unique output.
+Hashes are uniform in length, and can't be reverted.
+
+Hashes have interesting cryptographical properities which are beyond the scope of this discussion.
+
+
+
+
+
+** Classes and objects
+In python a class or object are a collection of interal logic (methods),
+and data.
+
+Classes can be used to interact with complex ideas like files, internet servers,
+sensors, etc.
+
+Programming that primarily / exlusively using objects is called:
+Object-Oriented Programming
+
+You can keep multiple independant copies (instances) of an object.
+
+
+
+** If, elif , and else
+
+To tell the computer about conditional statements, you use the if, else, and elif clauses.
+
+If tells the computer to execute the following section if the condition is true.
+
+Else tells the computer to exectute a section if the condition is false.
+** How to do something multiple times (Looping)
+
+For loops run a set number of times.
+
+While loops run until their condition is false.
+
+
+Computers represent where files are stored on computer.
+On Windows a path looks like this:
+#+begin_example
+C:\Users\Delta\Documents\file.txt
+#+end_example
+And on linux / Mac they look like this:
+#+begin_example
+/home/delta/Documents/file.txt
+#+end_example
+
+For continuty I will be using unix style strings whenever they show up.
+
+You can write absolute or relative paths.
+#+begin_example
+/home/delta/Documents/file.txt
+#+end_example
+
+#+begin_example
+# Assuming you're at /home/delta/
+./Documents/file.txt
+#+end_example
+
+** Installing 3rd party libraries (modules)
+To install 
+*** pip
+#+begin_src bash :noeval 
+pip install numpy
+#+end_src
+
+*** conda
+#+begin_src bash :noeval 
+conda install sympy
+#+end_src
+
+** Common 3rd party libraries for science
+ - Numpy:\\
+   Handles large arrays of numbers better than native python.
+ - Scipy:\\
+   A bunch of useful mathematical functions.
+ - Sympy:\\
+   A library for doing symbolic mathematics.
+ - Pandas:\\
+   A library for handling datasets like spreadsheets.
+ - Matplotlib:\\
+   A library for creating graphs, charts, and figures.
+ - pint:\\
+   Ensures your math takes units into account.
+
+
+
+* TODO Conclusion
+
+** Learning to program is hard, but you can do it.
+Learning is a physical process that takes time and energy.\\
+At somepoint, you *will* hit a metaphorical brick wall.
+*** For when you encounter trouble                                  :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+ - Take a break and re-evaluate the problem
+   - What are you trying to do?
+   - Are you asking the right question?
+ - Double check your steps
+   - Traceback messages are cryptic at first.
+   - Learn to read them for invaluable feedback.
+ - Try duck debugging!
+   - Explain what you're working on to a rubber duck.
+   - While silly it helps more often than not.
+** Ask for help when you need it!
+There simply is too much to know for anyone to know everything.\\
+Asking for help is one of the most important skills in a developers toolkit.
+*** Tips for asking for help                                        :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+You will need to ask for help at some point.
+ - Describe the problem
+   - be as clear as possible
+   - be as detailed as necessary     
+ - What have you tried so far?
+ - Have you looked at how others solved similar problems?
+
+
+
+** Embrace mistakes when learning
+You will make mistakes, that's part of the learning process.
+
+Some people exploit this in productivity style called Agile:
+where in you fail fast, and often; iterating on your mistakes each time.
+
+Failures, and unexpected results offer vital information about the boundry of
+a problem.
+
+Remember to document what you've tried, it will be useful 6 months later
+and you can't remember why you did it that way.
+
+** Computers are fallable!
+Common pitfall to watchout for:
+ - Don't assume computers are alway right
+ - Computers are fast, but stupid
+ - Computer can and will break if you tell them
+
+Think of a computer like a very fast, very eagar, very naive lab assistant.
+If you give them incomplete, or bad instructions, you will get bad results.
+*** Example
+:PROPERTIES:
+:BEAMER_ENV: exampleblock
+:END:
+
+#+begin_src ipython
+result = []
+
+for i in range(10):
+    result.append(i)
+
+    result = [i]
+
+print(sum(result))
+#+end_src
+#+caption: 
+
+Computers will only access memory that they've been told to.
+So if you define a variable inside a function, and try to call it outside the function, you'll run into problems.
+This is generally called a scoping issue:
+
+*** Example
+:PROPERTIES:
+:BEAMER_ENV: exampleblock
+:END:
+
+#+begin_src ipython :noeval 
+def f(x):
+    #f(x) has a secret variable b
+    b = 5
+    return x + b
+
+#this is outside the function:
+print(f(10)) # 15
+print(b) # Error!!
+#print(f(x).b) # 5
+#+end_src
+
+
+** There isn't a best way to do things
+
+*** block 1
+Often we will come across a reference that says:
+"X is the best way to do Y!"
+
+*** block 2
+Very rarely is there only one way to solve a problem.
+
+*** block 3
+The best solution can be different for different situations.
+
+
+
+** Still not convinced?
+This entire presentation was written using a combination of tools including:
+ - emacs
+   - orgmode
+ - latex
+   - beamer
+   - tikz
+ - python
+   - matplotlib
+     
+
+** Summary
+With some initial setup time, computers can greatly improve your work
+as a scientist.
+
+
+* Addendium                               
+
+** TODO Bibliography
+[[bibliography:../bibliography/references.bib]]
+[[bibliographystyle:amsplain]]
+** TODO Further Reading
+
+ - https://youtu.be/dQhj5RGtag0
+** TODO Prompt for questions
+
+* Links                                                            :noexport:
+
+[[id:24586-3012-4104-b65b-bf2a2e526a18][Roam Index]]
+
+[[id:da153c54-5934-4b5b-90c0-9b7e0dab9cd9][Python]]
+
+[[id:c1622e03-0f6e-47d4-be82-8eea88c4dc3f][Matplotlib]]:
+ - https://matplotlib.org/stable/users/index.html
+ - https://matplotlib.org/stable/tutorials/index.html
+ - https://matplotlib.org/stable/plot_types/index.html
+ - https://matplotlib.org/stable/api/index.html
+
+[[id:6550f037-b51e-4e62-bbab-e1874c23ba5e][numpy]]
+
+[[id:a624a7ff-29e5-4796-93ec-a271fee0acb4][Pandas]]
+
+
+   https://www.aruplab.com/magnify23/sanguine-new-data-visualization-tool-predicts-transfusion-needs
+
+[[id:9b0f7c69-04be-4aef-9ccc-f83f9294c91c][Bioinformatics Data Skills (Vince Buffalo)]]
+
+[[id:0c64f7dd-7999-46d6-a538-9e31da3a6541][ModelingAndSimulationInPython]]
+
+[[id:163a9579-1301-4e9d-a388-73b9ffe71ced][Scipy]]
+
+https://orgmode.org/worg/exporters/beamer/tutorial.html
+https://texdoc.org/serve/beamer/0
+https://en.wikipedia.org/wiki/List_of_programming_languages
+
+https://nigms.nih.gov/education/Inside-Life-Science/Pages/Genetics-by-the-Numbers.aspx
+
+https://med.stanford.edu/news/all-news/2022/01/dna-sequencing-technique.html
+
+https://pbs.twimg.com/media/FspnKDKaEAACpQi?format=jpg&name=small
+
+https://chartio.com/learn/business-intelligence/5-data-visualization-best-practices/
+
+* C code for summation                                             :noexport:
+
+#+begin_src C :tangle ~/sum.c 
+#include <stdio.h>
+
+int main()
+{
+   int n, sum = 0, c, array[100];
+
+   scanf("%d", &n);
+
+   for (c = 0; c < n; c++)
+   {
+      scanf("%d", &array[c]);
+      sum = sum + array[c];
+   }
+
+   printf("Sum = %d\n", sum);
+
+   return 0;
+}
+#+end_src
