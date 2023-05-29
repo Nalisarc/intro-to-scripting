@@ -36,6 +36,13 @@ import random
 #+RESULTS:
 : # Out[1]:
 
+#+name: org-ref-csl-preprocess
+#+begin_src emacs-lisp
+(add-hook 'org-export-before-parsing-hook 'org-ref-csl-preprocess-buffer)
+#+end_src
+
+#+RESULTS:
+| org-ref-csl-preprocess-buffer | org-attach-expand-links |
 
  
 #+begin_src emacs-lisp
@@ -84,7 +91,7 @@ Run this block to export as standard beamer presentation
 #+end_src
 
 *** Handout Setting                                                :noexport:
-Run this block to theoretically export it with my extra notes but no animation.
+Run this block to export it with my extra notes but no animation.
 #+name: handout-export
 #+begin_src org
 ,#+OPTIONS: H:2
@@ -142,7 +149,7 @@ Mad scientist extraordinaire.
 
 ** Discussion Expectations
 *** What we'll be covering     
- - What is programming / scripting
+ - What is programming / scripting.
  - How computers represent things. 
  - How scripting can make your work more reproducible.
  - Why introducing scripts can make your work easier as a scientist.
@@ -191,6 +198,7 @@ A program that typically:
    
 
    
+
 ** How do you talk to computers?
 Modern computers run an operating system (OS)\\
 used to schedule programs.
@@ -216,8 +224,11 @@ A program that represents the shell graphically.
 * Computers are a revolutionary tool
 
 ** Computers can handle Massive data sets 
+:PROPERTIES:
+:BEAMER_opt: shrink=15
+:END:
 
-The human genome is made up of 3.2 billion base pairs.
+The human genome is made up of 3.2 billion base pairs [[cite:&Toledo_C_2012]].
 
 *** Exercise: How big is that?                                      :B_block:
 :PROPERTIES:
@@ -225,7 +236,7 @@ The human genome is made up of 3.2 billion base pairs.
 :END:
 
 How long would it take to transcribe at:\\
-60 words per minute taking 8 hour days?
+60 words per minute taking 8 hour days [[cite:&Toledo_C_2012]]?
 
 **** Answers                                                          :BMCOL:
 :PROPERTIES:
@@ -249,7 +260,7 @@ How long would it take to transcribe at:\\
 :PROPERTIES:
 :BEAMER_env: exampleblock
 :END:
-Stanford scientists sequenced a human genome in just over 5 hours!
+Stanford scientists sequenced a human genome in just over 5 hours [[cite:&Armitage_H_2012]]!
 
 
 ** Alright, I'll Byte
@@ -266,11 +277,17 @@ A bit is an object,that can be in one of two states.
 :BEAMER_env: definition
 :END:
 A byte is a sequence of 8 bits.
-*** Blob                                                       :B_definition:
+*** Blob / Binary                                            :B_definition:
 :PROPERTIES:
 :BEAMER_env: definition
 :END:
 An arbitrarily large sequence of bytes.
+*** Terminology                                                    :B_note:
+:PROPERTIES:
+:BEAMER_env: note
+:END:
+Blob is a term from database administration, and you don't tend to
+see it outside of that field.
 ** Computers represent things using bytes
 Using a large number of bytes you can represent all sorts of things:
 *** Examples                                           :B_exampleblock:
@@ -348,11 +365,19 @@ Scale is described using SI notation.
 Statistical calculations sleuth out the who, what, when, where, why.
 *** Visualization tells it
 Tables and charts show the story in a way people can understand.
-** Data visualization has real world uses
-
-#+DOWNLOADED: screenshot @ 2023-05-12 20:46:53
-[[file:Computers_are_a_revolutionary_tool/2023-05-12_20-46-53_screenshot.png]]
-*** 
+** Example: Sanguine
+*** Blood Transfusion is a Complex Problem                        :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+Transfusion is a powerful tool that has saved countless lives.
+**** 
+However as with any clinical procedure comes with risk such as
+transfusion-associated circulatory overload (TACO), which occurs when blood volumes become too high and
+can lead to pulmonary edema [[cite:&Carrigan_K_2023]].
+** Sanguine (cont.)
+#+caption: (Carrigan 2023)
+[[./media/images/data-vis-1.jpg]]
 
 ** Data visualization tips
 Strive for accessible visualizations!
@@ -479,10 +504,9 @@ That being said, *every* tool can be misused.
 ** Scripting allows you to redo you work easily             
 Reusing code can let you standardize and automate your workflow.
 
-*** Pasteurization Report Generator                       :B_example:BMCOL:
+*** Pasteurization Report Generator                       :B_example:
 :PROPERTIES:
 :BEAMER_env: example
-:BEAMER_col: 0.75
 :END:
 A previous employer pasteurized breast-milk for at-risk newborns.
 #+latex: \vfill
@@ -568,6 +592,7 @@ new projects using it.
 :BEAMER_env: note
 :END:
 Many in the scientific community use the Anaconda ecosystem.
+
 Anaconda bundles many useful applications for research but is beyond the scope
 of this discussion.
 
@@ -575,12 +600,12 @@ of this discussion.
 :PROPERTIES:
 :BEAMER_env: note
 :END:
-The most common variant of python is CPython, but other versions exist such as:
+The most common flavor of python is CPython, but other versions exist such as:
  - PyPy
  - Ironpython
  - Jython
 
-Generally python code is compatible with all variants, but there might be
+Generally python code is compatible with all flavors, but there might be
 complications with more complex modules.
 
 *** Follow the $PATH                                                 :B_note:
@@ -621,6 +646,31 @@ pretty printing, and auto-complete.
 
 While these improvements aren't strictly necessary, they can make your
 life as a scientist much easier.
+
+** Integrated Development Environments (IDEs)
+While the REPL is useful, it often isn't practical to program excusively using it.
+Integrated development evironments offer many quality of life improvements.
+
+*** Pros of IDEs                                     :B_exampleblock:BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_env: exampleblock
+:END:
+- Autocomplete
+- Integrated shell
+- Build tools
+- Version control
+
+*** IDE examples                                     :B_exampleblock:BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_env: exampleblock
+:END:
+- Emac
+- Pycharm
+- Spyder
+- VSCode
+
 
 
 ** Types and how things are represented
@@ -957,6 +1007,31 @@ Tools such as ~pipx~ or ~pipenv~ can automate this for you.
    Create graphs, charts, and figures.
  - Pint: \\
    Ensures your math takes units into account.
+
+** Why not use office software?
+While spreadsheet programs are useful tools, they aren't built for scientific work.
+*** Autocorrect mangles data
+30% of published papers contain mangled gene names in supplimentary data [[cite:&Lewis_d_2021]].
+
+*** Can't handle large datasets
+Excel has a limit of 1,048,576 rows and 16,384 columns per sheet [[cite:&MS_Excel_Spec]].
+
+*** Bulky
+When dealing with larger datasets, typical spreadsheet software can become unresponsive.
+
+
+** Jupyter
+Jupyter notebooks allow for you to define create documents that weave code and data together.
+
+[[./media/images/Screenshot from 2023-05-26 18-33-51.png]]
+
+** Jupyter (cont.)
+Jupyter notebooks have many benefits including:
+- Live and reactive plots
+- Directly interact with APIs
+- Sharable format
+
+
 * Conclusion
 
 ** Learning to program is hard, but you can do it.
@@ -1103,6 +1178,58 @@ nalisarc@gmail.com
   isbn: 978-1-492-03108-6
 
 
+** Bibliography
+:PROPERTIES:
+:BEAMER_opt: shrink=10
+:END:
+#+begin_src bibtex :exports none :tangle ref.bib 
+@misc{ MS_Excel_Spec,
+title = {Excel specifications and limits},
+author = {"Microsoft"},
+month = {May},
+year = {2023},
+howpublished = {\url{https://support.microsoft.com/en-au/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3}},
+note = {No publish date listed (Accessed 5/27/23)}
+},
+}
+@misc{ Lewis_d_2021,
+  author       = {Dyani Lewis},
+  title        = {Autocorrect errors in Excel still creating genomics headache},
+  howpublished = {\url{https://www.nature.com/articles/d41586-021-02211-4}},
+  month        = {August},
+  year         = {2021},
+  note         = {Behind paywall (Accessed 5/27/23)}
+}
+@misc{ Carrigan_K_2023,
+  author       = {Kellie Carrigan},
+  title        = {Sanguine, a New Data Visualization Tool, Predicts Transfusion Needs and Provides Risk-Adjusted Benchmarking to Improve Patient Outcomes},
+  howpublished = {\url{https://www.aruplab.com/magnify23/sanguine-new-data-visualization-tool-predicts-transfusion-needs}},
+  month        = {March},
+  year         = {2023},
+  note         = {(Accessed 5/37/23)}
+}
+@misc{ Toledo_C_2012,
+  author       = {Chelsea Toledo and Kirstie Saltsman},
+  title        = {Genetics by the Numbers},
+  howpublished = {\url{https://nigms.nih.gov/education/Inside-Life-Science/Pages/Genetics-by-the-Numbers.aspx}},
+  month        = {June},
+  year         = {2012},
+  note         = {(Accessed 5/27/23)}
+}
+@misc{ Armitage_H_2012,
+  author       = {Hanae Armitage},
+  title        = {Fastest DNA sequencing technique helps undiagnosed patients find answers in mere hours},
+  howpublished = {\url{https://med.stanford.edu/news/all-news/2022/01/dna-sequencing-technique.html}},
+  month        = {January},
+  year         = {2012},
+  note         = {(Accessed 5/27/23)}
+}
+#+end_src
+
+
+[[bibliography:/home/delta/agcloud/org/ref.bib]]
+[[bibliographystyle:aasjournal]]
+
 * Links                                                            :noexport:
 
 [[id:24586-3012-4104-b65b-bf2a2e526a18][Roam Index]]
@@ -1140,3 +1267,4 @@ https://pbs.twimg.com/media/FspnKDKaEAACpQi?format=jpg&name=small
 
 https://chartio.com/learn/business-intelligence/5-data-visualization-best-practices/
 
+https://www.nature.com/articles/d41586-021-02211-4
